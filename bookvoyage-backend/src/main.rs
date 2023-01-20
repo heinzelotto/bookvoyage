@@ -1,6 +1,11 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Result};
-use rand::prelude::random;
+use actix_web::{
+    get, middleware::Logger, post, web, App, HttpResponse, HttpServer, Responder, Result,
+};
 use serde_derive::{Deserialize, Serialize};
+
+mod db_operations;
+mod model;
+mod schema;
 
 #[derive(Serialize, Debug)]
 struct BookCode {
@@ -40,7 +45,8 @@ struct SendPost {
     author: String,
     review: String,
     code: String,
-    coords: String,
+    lat: f32,
+    lon: f32,
 }
 
 #[get("/")]
@@ -57,22 +63,73 @@ async fn code() -> Result<impl Responder> {
 
 #[post("/send")]
 async fn send(data: web::Json<SendPost>) -> Result<impl Responder> {
-    dbg!(
-        &data.title,
-        &data.author,
-        &data.review,
-        &data.code,
-        &data.coords
-    );
+    let post = dbg!(data.into_inner());
+    let mut connection = db_operations::establish_connection();
+
+    let new_book = model::NewBook {
+        title: post.title,
+        author: post.author,
+        code: post.code,
+    };
+    let created_book = db_operations::create_book(&mut connection, &new_book)
+        .expect("New book could not be created.");
+
+    let first_log = model::NewBookLog {
+        book_id: created_book.id,
+        commenter: String::from("anonymous"),
+        comment: post.review,
+        lat: post.lat,
+        lon: post.lon,
+    };
+    let created_first_log = db_operations::create_book_log(&mut connection, &first_log)
+        .expect("First logging could not be created.");
+
+    db_operations::show(&mut connection);
+
     Ok(dbg!(web::Json(SendResponse {
-        response: String::from("This is just a mock for now. Book will be added to database soon!")
+        response: format!(
+            "Book inserted into db with ID {}. Book log inserted into db with ID {}",
+            created_book.id, created_first_log.id
+        )
     })))
+}
+
+#[get("/book_list")]
+async fn book_list() -> Result<impl Responder> {
+    let mut connection = db_operations::establish_connection();
+
+    let l =
+        db_operations::retrieve_book_list(&mut connection).expect("Couldn't retreive book list");
+
+    Ok(dbg!(web::Json(l)))
+}
+
+#[get("/book_logs/{book_id}")]
+async fn book_logs(path: web::Path<i32>) -> Result<impl Responder> {
+    let book_id = path.into_inner();
+
+    let mut connection = db_operations::establish_connection();
+
+    let l = db_operations::retrieve_book_logs(&mut connection, book_id)
+        .expect("Couldn't retreive book logs for id {book_id}");
+
+    Ok(dbg!(web::Json(l)))
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(hello).service(code).service(send))
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+
+    HttpServer::new(|| {
+        App::new()
+            .wrap(Logger::default())
+            .service(hello)
+            .service(code)
+            .service(send)
+            .service(book_list)
+            .service(book_logs)
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }

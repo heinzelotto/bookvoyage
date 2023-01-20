@@ -12,6 +12,11 @@ export async function POST({ request }) {
         }
     });
 
+    if (!response.ok) {
+        // TODO: handle error status code without failing later
+        console.log(await response.text());
+    }
+
     let total = await response.json();
 
     console.log(total);

@@ -3,7 +3,7 @@
 
     import { onMount } from 'svelte';
 
-    let map;
+    //let map;
     let leafletPromise: Promise<any>;
 
     onMount(() => {
@@ -15,8 +15,10 @@
         document.head.appendChild(link);
 
         return () => {
-            map.remove();
-            link.parentNode.removeChild(link);
+            //map.remove();
+            if (link != null) {
+                link.parentNode.removeChild(link);
+            }
         };
     });
 
@@ -49,23 +51,20 @@
     }
 
     async function doPost(data: any) {
-        console.log(JSON.stringify({
+        let payload = JSON.stringify({
                     title: data["title"],
                     author: data["author"],
                     review: data["review"],
                     code: data["bookCode"],
-                    coords: data["coords"],
-                }));
+                    lat: parseFloat(data["lat"]),
+                    lon: parseFloat(data["lon"]),
+                });
+
+        console.log(payload);
 
         const res = await fetch('/api/send', {
                 method: 'POST',
-                body: JSON.stringify({
-                    title: data["title"],
-                    author: data["author"],
-                    review: data["review"],
-                    code: data["bookCode"],
-                    coords: data["coords"],
-                })
+                body: payload,
             });
 
             const json = await res.json();
@@ -94,10 +93,12 @@
         }
     }
 
-    let coordsString = "";
-    function handleMapUpdate({ detail }) {
+    let latString = "";
+    let lonString = "";
+    function handleMapUpdate({ detail }: {detail: any}) {
         let coords = detail.geometry.coordinates;
-        coordsString = coords[0] + " " + coords[1];
+        latString = coords[1];
+        lonString = coords[0];
         console.log('Update event! ', detail.geometry.coordinates);
     }
 
@@ -136,7 +137,6 @@
         <input id="bookCode" name="bookCode" type="text" readOnly="true" bind:value="{bookCodeString}"/>
         {#await bookCodePromise}
             <strong>Generating BookCode...</strong>
-        {:then bookCode}
         {:catch err}
             <p><small style="color: red"> { err } </small></p>
         {/await}
@@ -146,10 +146,17 @@
     </div>
 
     <div>
-        <label for="coords"> <strong>Coordinates</strong></label>
-        <input id="coords" name="coords" type="text" placeholder="Choose on map" readOnly="true" bind:value="{coordsString}"/>
-        {#if errors.coords}
-            <p><small style="color: red"> { errors.coords } </small></p>
+        <label for="lat"> <strong>Latitude</strong></label>
+        <input id="lat" name="lat" type="text" placeholder="Choose on map" readOnly="true" bind:value="{latString}"/>
+        {#if errors.lat}
+            <p><small style="color: red"> { errors.lat } </small></p>
+        {/if}
+    </div>
+    <div>
+        <label for="lon"> <strong>Longitude</strong></label>
+        <input id="lon" name="lon" type="text" placeholder="Choose on map" readOnly="true" bind:value="{lonString}"/>
+        {#if errors.lon}
+            <p><small style="color: red"> { errors.lon } </small></p>
         {/if}
     </div>
 
