@@ -104,13 +104,25 @@ async fn book_list() -> Result<impl Responder> {
     Ok(dbg!(web::Json(l)))
 }
 
-#[get("/book_logs/{book_id}")]
-async fn book_logs(path: web::Path<i32>) -> Result<impl Responder> {
+#[get("/book_list/by_code/{book_code}")]
+async fn book_list_by_code(path: web::Path<String>) -> Result<impl Responder> {
+    let book_code = path.into_inner();
+
+    let mut connection = db_operations::establish_connection();
+
+    let l = db_operations::retrieve_books_by_code(&mut connection, &book_code)
+        .expect("Couldn't retreive book for code {book_code}");
+
+    Ok(dbg!(web::Json(l)))
+}
+
+#[get("/book_logs/by_id/{book_id}")]
+async fn book_logs_by_id(path: web::Path<i32>) -> Result<impl Responder> {
     let book_id = path.into_inner();
 
     let mut connection = db_operations::establish_connection();
 
-    let l = db_operations::retrieve_book_logs(&mut connection, book_id)
+    let l = db_operations::retrieve_book_logs_by_id(&mut connection, book_id)
         .expect("Couldn't retreive book logs for id {book_id}");
 
     Ok(dbg!(web::Json(l)))
@@ -127,7 +139,8 @@ async fn main() -> std::io::Result<()> {
             .service(code)
             .service(send)
             .service(book_list)
-            .service(book_logs)
+            .service(book_list_by_code)
+            .service(book_logs_by_id)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

@@ -1,6 +1,7 @@
 use crate::model::*;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use diesel::result::Error;
 use dotenv::dotenv;
 use std::env;
 
@@ -44,7 +45,21 @@ pub fn retrieve_book_list(
         .load::<Book>(connection)
 }
 
-pub fn retrieve_book_logs(
+pub fn retrieve_books_by_code(
+    connection: &mut PgConnection,
+    target_book_code: &str,
+) -> Result<Vec<Book>, diesel::result::Error> {
+    use crate::schema::books::dsl::*;
+
+    // TODO: rename "code" to "book_code"
+
+    books
+        .filter(code.eq(target_book_code))
+        .limit(1)
+        .load::<Book>(connection)
+}
+
+pub fn retrieve_book_logs_by_id(
     connection: &mut PgConnection,
     target_book_id: i32,
 ) -> Result<Vec<BookLog>, diesel::result::Error> {
