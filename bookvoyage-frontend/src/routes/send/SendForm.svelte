@@ -105,44 +105,53 @@
 </script>
 
 <form on:submit={handleOnSubmit}>
-    <div>
-        <label for="title"> <strong>Title</strong></label>
-        <input id="title" name="title" type="text" placeholder="Title" />
-        {#if errors.title}
-            <p><small style="color: red"> { errors.title } </small></p>
-        {/if}
+    <div class="form-control w-full max-w-xs">
+        <label class="label" for="title">
+            <span class="label-text">Title</span>
+            {#if errors.title}
+                <span class="text-red label-text-alt"> { errors.title }</span>
+            {/if}
+        </label>
+        <input id="title" name="title" type="text" placeholder="Title" class="input input-bordered w-full max-w-xs"/>
     </div>
 
-    <div>
-        <label for="author"> <strong>Author</strong></label>
-        <input id="author" name="author" type="text" placeholder="Author" />
-        {#if errors.author}
-            <p><small style="color: red"> { errors.author } </small></p>
-        {/if}
+    <div class="form-control w-full max-w-xs">
+        <label class="label" for="author">
+            <span class="label-text">Author</span>
+            {#if errors.author}
+                <span class="text-red label-text-alt"> { errors.author }</span>
+            {/if}
+        </label>
+        <input id="author" name="author" type="text" placeholder="Author" class="input input-bordered w-full max-w-xs"/>
     </div>
 
-    <div>
-        <label for="review"> <strong>Comment/Review</strong></label>
-        <textarea id="review" name="review" placeholder="What did you experience with this 📕?" />
-        {#if errors.review}
-            <p><small style="color: red"> { errors.review } </small></p>
-        {/if}
+    <div class="form-control w-full max-w-xs">
+        <label class="label" for="review">
+            <span class="label-text">Comment/Review</span>
+            {#if errors.review}
+                <span class="text-red label-text-alt"> { errors.review }</span>
+            {/if}
+        </label>
+        <textarea id="review" name="review" class="textarea textarea-bordered h-24" placeholder="What did you experience with this 📕?" />
     </div>
 
-    <div>
-        <label for="bookCode"> <strong>Book Code</strong></label>
-        <button on:click={async() => await getRandomBookCode()} type="button" aria-label="Reset counter">
-            Regenerate
-        </button>
-        <input id="bookCode" name="bookCode" type="text" readOnly="true" bind:value="{bookCodeString}"/>
+
+    <div class="form-control w-full max-w-xs">
+        <label class="label" for="bookCode">
+            <span class="label-text">Book Code</span>
+            {#if errors.bookCode}
+                <span class="text-red label-text-alt"> { errors.bookCode }</span>
+            {/if}
+        </label>
+        <input id="bookCode" name="bookCode" type="text" readOnly="true" bind:value="{bookCodeString}" class="input input-bordered w-full max-w-xs" />
         {#await bookCodePromise}
             <strong>Generating BookCode...</strong>
         {:catch err}
             <p><small style="color: red"> { err } </small></p>
         {/await}
-        {#if errors.bookCode}
-            <p><small style="color: red"> { errors.bookCode } </small></p>
-        {/if}
+        <button on:click={async() => await getRandomBookCode()} type="button" class="btn btn-xs">
+            Regenerate
+        </button>
     </div>
 
     <div>
@@ -161,7 +170,7 @@
     </div>
 
     <br />
-    <button id="submitButton" type="submit">Bon Voyage</button>
+    <button id="submitButton" type="submit" class="btn">Bon Voyage</button>
 </form>
 
 {#if submitPromise != null}
@@ -186,7 +195,7 @@ waiting leafletPromise..
 {/if}
 
 <style>
-    input[type=text], textarea {
+    /* input[type=text], textarea {
         padding: 10px;
         margin:10px 0;
         border: none;
@@ -210,7 +219,7 @@ waiting leafletPromise..
         box-shadow:0 0 15px 4px rgba(0,0,0,0.06);
         font-family: inherit;
         font-size: inherit;
-    }
+    } */
 
     .map-container {
         height:500px;        

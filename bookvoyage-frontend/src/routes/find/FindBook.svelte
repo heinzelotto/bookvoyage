@@ -61,7 +61,7 @@
 </ul>
 
 <label for="bookCode"><strong>Enter Book Code</strong></label>
-<input id="bookCode" name="bookCode" type="text" placeholder="Enter Book Code" bind:value="{bookCode}"
+<input class="input input-bordered input-primary w-full max-w-xs" id="bookCode" name="bookCode" type="text" placeholder="Enter Book Code" bind:value="{bookCode}"
 on:input={onBookCodeInput}>
 
 {#if fetchedBook != null}
@@ -75,7 +75,7 @@ We got the book!
     </li>
 {/if}
 
-<style>
+<!-- <style>
     input[type=text] {
         padding: 10px;
         margin:10px 0;
@@ -86,4 +86,4 @@ We got the book!
         font-family: inherit;
         font-size: inherit;
     }
-</style>
+</style> -->
