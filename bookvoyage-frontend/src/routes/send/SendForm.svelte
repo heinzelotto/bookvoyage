@@ -1,12 +1,28 @@
 <script lang="ts">
-    import PickAPlace from 'svelte-pick-a-place';
+    //import PickAPlace from 'svelte-pick-a-place';
 
-    import { onMount } from 'svelte';
+    import {onMount} from "svelte";
+//    import {LeafletMap, TileLayer} from 'svelte-leafletjs';
 
-    //let map;
     let leafletPromise: Promise<any>;
+    let LeafletMap;
+    let TileLayer;
+    let Marker;
 
-    onMount(() => {
+    const mapOptions = {
+        center: [0.0, 0.0],
+        zoom: 2,
+    };
+    const tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    const tileLayerOptions = {
+        minZoom: 0,
+        maxZoom: 20,
+        maxNativeZoom: 19,
+        attribution: "© OpenStreetMap contributors",
+    };
+    let leafletMap;
+
+    onMount(async () => {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://unpkg.com/leaflet@1.9.3/dist/leaflet.css';
@@ -15,8 +31,8 @@
         document.head.appendChild(link);
 
         return () => {
-            //map.remove();
-            if (link != null) {
+            leafletMap.remove();
+            if (link != null && link.parentNode != null) {
                 link.parentNode.removeChild(link);
             }
         };
@@ -24,13 +40,10 @@
 
     // TODO: read https://svelte.dev/repl/62271e8fda854e828f26d75625286bc3?version=3.55.1
     async function loadMap() {
-        leafletPromise = await import('leaflet');
-        // map = L.map('map').setView([49, 12], 13);
-        // L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png ', {
-        //     attribution:
-        //         'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-        //     maxZoom: 18,
-        // }).addTo(map);
+        leafletPromise = await import('svelte-leafletjs');
+        LeafletMap = leafletPromise.LeafletMap;
+        TileLayer = leafletPromise.TileLayer;
+        Marker = leafletPromise.Marker;
     }
 
     let bookCodeString = "";
@@ -93,13 +106,13 @@
         }
     }
 
-    let latString = "";
-    let lonString = "";
-    function handleMapUpdate({ detail }: {detail: any}) {
-        let coords = detail.geometry.coordinates;
-        latString = coords[1];
-        lonString = coords[0];
-        console.log('Update event! ', detail.geometry.coordinates);
+    let clickLat = null;
+    let clickLng = null;
+    function on_map_click(event) {
+        let coords = event.detail.latlng;
+        console.log(coords);
+        clickLat = parseFloat(coords['lat']);
+        clickLng = parseFloat(coords['lng']);
     }
 
 </script>
@@ -156,14 +169,14 @@
 
     <div>
         <label for="lat"> <strong>Latitude</strong></label>
-        <input id="lat" name="lat" type="text" placeholder="Choose on map" readOnly="true" bind:value="{latString}"/>
+        <input id="lat" name="lat" type="text" placeholder="Choose on map" readOnly="true" bind:value="{clickLat}"/>
         {#if errors.lat}
             <p><small style="color: red"> { errors.lat } </small></p>
         {/if}
     </div>
     <div>
         <label for="lon"> <strong>Longitude</strong></label>
-        <input id="lon" name="lon" type="text" placeholder="Choose on map" readOnly="true" bind:value="{lonString}"/>
+        <input id="lon" name="lon" type="text" placeholder="Choose on map" readOnly="true" bind:value="{clickLng}"/>
         {#if errors.lon}
             <p><small style="color: red"> { errors.lon } </small></p>
         {/if}
@@ -186,9 +199,14 @@
 {#await leafletPromise}
 waiting leafletPromise..
 {:then leaflet}
-<div class="map-container">
-    <PickAPlace leaflet={leaflet} on:update={handleMapUpdate} on:save={() =>
-    console.log('On save!')} /></div>
+<div class="example">
+    <svelte:component this={LeafletMap} events="{['click']}" on:click={on_map_click} options={mapOptions}>
+        <svelte:component this={TileLayer} url={tileUrl} options={tileLayerOptions}/>
+        {#if clickLat != null && clickLng != null}
+            <svelte:component this={Marker} latLng={[clickLat, clickLng]} />        
+        {/if}
+    </svelte:component>
+</div>
 {/await}
 {:else}
 <strong>Loading map...</strong>
@@ -221,7 +239,9 @@ waiting leafletPromise..
         font-size: inherit;
     } */
 
-    .map-container {
-        height:500px;        
+    .example {
+        height:500px;
+        width:500px;
     }
 </style>
+
