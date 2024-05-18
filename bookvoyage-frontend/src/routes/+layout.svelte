@@ -12,7 +12,9 @@
 	</div>
 
 	<footer class="flex flex-1 flex-col justify-center items-center p-12">
-		<p>visit <a href="https://kit.svelte.dev" class="font-bold">kit.svelte.dev</a> to learn SvelteKit</p>
+		<p>
+			visit <a href="https://kit.svelte.dev" class="font-bold">kit.svelte.dev</a> to learn SvelteKit
+		</p>
 	</footer>
 </div>
 

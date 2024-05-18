@@ -4,7 +4,7 @@ import { json } from '@sveltejs/kit';
 export async function POST({ request }) {
     const req = await request.json();
 
-    const response = await fetch("http://127.0.0.1:8080/send", {
+    const response = await fetch("http://127.0.0.1:8080/add_log", {
         method: 'POST',
         body: JSON.stringify(req),
         headers: {

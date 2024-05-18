@@ -49,6 +49,14 @@ struct SendPost {
     lon: f32,
 }
 
+#[derive(Deserialize, Debug)]
+struct AddLogPost {
+    code: String,
+    review: String,
+    lat: f32,
+    lon: f32,
+}
+
 #[get("/")]
 async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
@@ -90,6 +98,37 @@ async fn send(data: web::Json<SendPost>) -> Result<impl Responder> {
         response: format!(
             "Book inserted into db with ID {}. Book log inserted into db with ID {}",
             created_book.id, created_first_log.id
+        )
+    })))
+}
+
+#[post("/add_log")]
+async fn add_log(data: web::Json<AddLogPost>) -> Result<impl Responder> {
+    let post = dbg!(data.into_inner());
+    let mut connection = db_operations::establish_connection();
+
+    let book_id = db_operations::retrieve_books_by_code(&mut connection, &post.code)
+        .expect("Couldn't retreive book for code {book_code}")
+        .first()
+        .unwrap()
+        .id;
+
+    let new_book_log = model::NewBookLog {
+        book_id: book_id,
+        commenter: String::from("anonymous"),
+        comment: post.review,
+        lat: post.lat,
+        lon: post.lon,
+    };
+    let created_log = db_operations::create_book_log(&mut connection, &new_book_log)
+        .expect("New log could not be created.");
+
+    db_operations::show(&mut connection);
+
+    Ok(dbg!(web::Json(SendResponse {
+        response: format!(
+            "Book log inserted into db with ID {} (for book with ID {})",
+            created_log.id, book_id
         )
     })))
 }
@@ -141,6 +180,7 @@ async fn main() -> std::io::Result<()> {
             .service(book_list)
             .service(book_list_by_code)
             .service(book_logs_by_id)
+            .service(add_log)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

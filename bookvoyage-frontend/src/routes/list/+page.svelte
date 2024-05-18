@@ -1,5 +1,5 @@
 <script>
-	import SendForm from "./BookList.svelte"
+	import SendForm from './BookList.svelte';
 </script>
 
 <svelte:head>

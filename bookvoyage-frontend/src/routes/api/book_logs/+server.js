@@ -3,7 +3,7 @@ import { json } from '@sveltejs/kit';
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url }) {
     const book_id = Number(url.searchParams.get('book_id') ?? '1');
-    const res = await fetch(`http://localhost:8080/book_logs/by_id/${book_id}`);
+    const res = await fetch(`http://127.0.0.1:8080/book_logs/by_id/${book_id}`);
     let code = await res.json();
 
     console.log(code);

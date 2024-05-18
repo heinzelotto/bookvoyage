@@ -1,5 +1,5 @@
 <script>
-	import SendForm from "./SendForm.svelte"
+	import SendForm from './SendForm.svelte';
 </script>
 
 <svelte:head>

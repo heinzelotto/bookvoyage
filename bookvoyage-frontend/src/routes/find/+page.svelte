@@ -1,5 +1,5 @@
 <script>
-	import SendForm from "./FindBook.svelte"
+	import SendForm from './FindBook.svelte';
 </script>
 
 <svelte:head>

@@ -13,10 +13,7 @@ pub fn establish_connection() -> PgConnection {
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
 
-pub fn create_book(
-    connection: &mut PgConnection,
-    new_book: &NewBook,
-) -> Result<Book, diesel::result::Error> {
+pub fn create_book(connection: &mut PgConnection, new_book: &NewBook) -> Result<Book, Error> {
     use crate::schema::books;
 
     diesel::insert_into(books::table)
@@ -27,7 +24,7 @@ pub fn create_book(
 pub fn create_book_log(
     connection: &mut PgConnection,
     new_book_log: &NewBookLog,
-) -> Result<BookLog, diesel::result::Error> {
+) -> Result<BookLog, Error> {
     use crate::schema::book_logs;
 
     diesel::insert_into(book_logs::table)
@@ -35,9 +32,7 @@ pub fn create_book_log(
         .get_result(connection)
 }
 
-pub fn retrieve_book_list(
-    connection: &mut PgConnection,
-) -> Result<Vec<Book>, diesel::result::Error> {
+pub fn retrieve_book_list(connection: &mut PgConnection) -> Result<Vec<Book>, Error> {
     use crate::schema::books::dsl::*;
 
     books
@@ -48,7 +43,7 @@ pub fn retrieve_book_list(
 pub fn retrieve_books_by_code(
     connection: &mut PgConnection,
     target_book_code: &str,
-) -> Result<Vec<Book>, diesel::result::Error> {
+) -> Result<Vec<Book>, Error> {
     use crate::schema::books::dsl::*;
 
     // TODO: rename "code" to "book_code"
@@ -62,7 +57,7 @@ pub fn retrieve_books_by_code(
 pub fn retrieve_book_logs_by_id(
     connection: &mut PgConnection,
     target_book_id: i32,
-) -> Result<Vec<BookLog>, diesel::result::Error> {
+) -> Result<Vec<BookLog>, Error> {
     use crate::schema::book_logs::dsl::*;
 
     book_logs
