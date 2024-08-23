@@ -8,6 +8,7 @@ diesel::table! {
         comment -> Text,
         lat -> Float4,
         lon -> Float4,
+        user_id -> Nullable<Int4>,
     }
 }
 
@@ -17,7 +18,20 @@ diesel::table! {
         title -> Varchar,
         author -> Varchar,
         code -> Varchar,
+        user_id -> Nullable<Int4>,
     }
 }
 
-diesel::allow_tables_to_appear_in_same_query!(book_logs, books,);
+diesel::table! {
+    users (id) {
+        id -> Int4,
+        username -> Varchar,
+        password_hash -> Varchar,
+        created_at -> Nullable<Timestamptz>,
+    }
+}
+
+diesel::joinable!(book_logs -> users (user_id));
+diesel::joinable!(books -> users (user_id));
+
+diesel::allow_tables_to_appear_in_same_query!(book_logs, books, users,);

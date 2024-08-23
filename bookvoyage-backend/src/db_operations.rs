@@ -13,6 +13,14 @@ pub fn establish_connection() -> PgConnection {
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
 
+pub fn create_user(connection: &mut PgConnection, new_user: &NewUser) -> Result<User, Error> {
+    use crate::schema::users;
+
+    diesel::insert_into(users::table)
+        .values(new_user)
+        .get_result(connection)
+}
+
 pub fn create_book(connection: &mut PgConnection, new_book: &NewBook) -> Result<Book, Error> {
     use crate::schema::books;
 
@@ -38,6 +46,27 @@ pub fn retrieve_book_list(connection: &mut PgConnection) -> Result<Vec<Book>, Er
     books
         //.limit(5)
         .load::<Book>(connection)
+}
+
+pub fn retrieve_user_list(connection: &mut PgConnection) -> Result<Vec<User>, Error> {
+    use crate::schema::users::dsl::*;
+
+    users
+        //.limit(5)
+        .load::<User>(connection)
+}
+
+pub fn retrieve_user_by_username(
+    connection: &mut PgConnection,
+    target_username: &str,
+) -> Result<User, Error> {
+    use crate::schema::users::dsl::*;
+
+    users
+        .filter(username.eq(target_username))
+        .limit(1)
+        .load::<User>(connection)
+        .map(|item| (*item.first().unwrap()).clone())
 }
 
 pub fn retrieve_books_by_code(

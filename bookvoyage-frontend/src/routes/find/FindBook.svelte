@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { getAuthHeader } from '../auth.js';
 	import L from 'leaflet';
 
 	let books: { book_info: any; book_logs: any }[] = [];
@@ -20,7 +21,12 @@
 
 		for (var book of book_list) {
 			var book_logs_response = await fetch(
-				`http://localhost:5173/api/book_logs/?book_id=${book['id']}`
+				`http://localhost:5173/api/book_logs/by_id/${book['id']}`,
+				{
+					headers: {
+						Authorization: getAuthHeader()
+					}
+				}
 			);
 			var book_logs = await book_logs_response.json();
 
@@ -54,12 +60,21 @@
 	}
 
 	async function fetchBooks() {
-		var book_list_response = await fetch('http://localhost:5173/api/book_list');
+		var book_list_response = await fetch('http://localhost:5173/api/book_list', {
+			headers: {
+				Authorization: getAuthHeader()
+			}
+		});
 		let book_list = await book_list_response.json();
 
 		for (var book of book_list) {
 			var book_logs_response = await fetch(
-				`http://localhost:5173/api/book_logs/?book_id=${book['id']}`
+				`http://localhost:5173/api/book_logs/by_id/${book['id']}`,
+				{
+					headers: {
+						Authorization: getAuthHeader()
+					}
+				}
 			);
 			var book_logs = await book_logs_response.json();
 
@@ -80,7 +95,12 @@
 		console.log(bookCode.length);
 		if (bookCode.length == bookCodeLen) {
 			var book_list_response = await fetch(
-				`http://localhost:5173/api/book_list/?book_code=${bookCode}`
+				`http://localhost:5173/api/book_list/by_code/${bookCode}`,
+				{
+					headers: {
+						Authorization: getAuthHeader()
+					}
+				}
 			);
 			var book_list = await book_list_response.json();
 
@@ -89,7 +109,12 @@
 				let book = book_list[0];
 
 				var book_logs_response = await fetch(
-					`http://localhost:5173/api/book_logs/?book_id=${book['id']}`
+					`http://localhost:5173/api/book_logs/by_id/${book['id']}`,
+					{
+						headers: {
+							Authorization: getAuthHeader()
+						}
+					}
 				);
 				var book_logs = await book_logs_response.json();
 
@@ -129,7 +154,11 @@
 
 		const res = await fetch('/api/add_log', {
 			method: 'POST',
-			body: payload
+			body: payload,
+			headers: {
+				Authorization: getAuthHeader(),
+				'content-type': 'application/json'
+			}
 		});
 
 		const json = await res.json();

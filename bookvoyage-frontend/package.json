@@ -21,20 +21,22 @@
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-svelte3": "^4.0.0",
+		"leaflet": "^1.9.3",
 		"postcss": "^8.4.21",
 		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.8.1",
 		"svelte": "^3.54.0",
 		"svelte-check": "^3.0.2",
-		"svelte-preprocess": "^5.0.0",
 		"svelte-leafletjs": "^0.9.1",
-		"leaflet": "^1.9.3",
+		"svelte-preprocess": "^5.0.0",
 		"tailwindcss": "^3.2.7",
 		"typescript": "^4.9.4",
 		"vite": "^4.0.0"
 	},
 	"dependencies": {
-		"daisyui": "^2.51.3"
+		"@macfja/svelte-persistent-store": "^2.4.1",
+		"daisyui": "^2.51.3",
+		"svelte-persistent-store": "^0.1.6"
 	},
 	"type": "module"
 }

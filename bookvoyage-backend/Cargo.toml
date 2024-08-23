@@ -7,13 +7,17 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4"
-diesel = {version = "2.0.2", features=["postgres", "r2d2"]}
+actix-web-httpauth = "0.8"
+jsonwebtoken = "9.3"
+bcrypt = "0.15"
+chrono = {version = "0.4", features = ["serde"]}
+diesel = {version = "2.0.2", features=["postgres", "r2d2", "chrono"]}
 dotenv = "0.15.0"
 #r2d2-diesel = "1.0.0"
 #r2d2 = "0.8.9"
-serde = "1.0.152"
-serde_derive = "1.0.152"
-serde_json = "1.0.58"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
 rand = "0.8.5"
-env_logger = "0.10.0"
-log = "0.4.17"
+env_logger = "0.11"
+log = "0.4"

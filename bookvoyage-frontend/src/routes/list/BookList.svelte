@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { getAuthHeader } from '../auth.js';
 	import L from 'leaflet';
 
 	let books: { book_info: any; book_logs: any }[] = [];
@@ -15,12 +16,28 @@
 	});
 
 	async function fetchList() {
-		var book_list_response = await fetch('http://localhost:5173/api/book_list');
+		var book_list_response = await fetch('http://localhost:5173/api/book_list', {
+			headers: {
+				Authorization: getAuthHeader()
+			}
+		});
+
+		if (!book_list_response.ok) {
+			console.log(book_list_response);
+			return;
+		}
+
 		let book_list = await book_list_response.json();
+		console.log(book_list);
 
 		for (var book of book_list) {
 			var book_logs_response = await fetch(
-				`http://localhost:5173/api/book_logs/?book_id=${book['id']}`
+				`http://localhost:5173/api/book_logs/by_id/${book['id']}`,
+				{
+					headers: {
+						Authorization: getAuthHeader()
+					}
+				}
 			);
 			var book_logs = await book_logs_response.json();
 

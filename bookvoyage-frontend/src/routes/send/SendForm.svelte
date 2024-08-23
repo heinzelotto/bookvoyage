@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { getAuthHeader } from '../auth.js';
 	import L from 'leaflet';
 
 	let map;
@@ -80,7 +81,11 @@
 
 		const res = await fetch('/api/send', {
 			method: 'POST',
-			body: payload
+			body: payload,
+			headers: {
+				Authorization: getAuthHeader(),
+				'content-type': 'application/json'
+			}
 		});
 
 		const json = await res.json();
